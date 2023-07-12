@@ -23,6 +23,31 @@ func maxAlternatingSum(nums []int) int64 {
 	return max64(dp[n-1][0], dp[n-1][1])
 }
 
+// 2023-07-12 19:41:06
+// 2544.数字的交替和
+// 给定一个正整数 n ，最高有效位赋+，其余位数依次赋-，+
+
+// 用一下闭包
+func alternateDigitSum(n int) int {
+	nums := make([]int, 0)
+	for n > 0 {
+		nums = append(nums, n%10)
+		n /= 10
+	}
+	res := 0
+	changer := func() func() int {
+		x := -1
+		return func() int {
+			return -x
+		}
+	}
+	f := changer()
+	for i := len(nums) - 1; i >= 0; i-- {
+		res += f() * nums[i]
+	}
+	return res
+}
+
 func max64(a, b int64) int64 {
 	if a > b {
 		return a

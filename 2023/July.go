@@ -48,6 +48,63 @@ func alternateDigitSum(n int) int {
 	return res
 }
 
+// 2023-07-13 21:41:19
+// 931. 下降路径最小和
+// 给你一个 n x n 的 方形 整数数组 matrix ，请你找出并返回通过 matrix 的下降路径 的 最小和
+// 下降路径 可以从第一行中的任何元素开始，并从每一行中选择一个元素，直到到达最后一行为止，每次下降可以选择正下方或者正下方相邻的元素
+
+// 回溯 : 依次遍历每一行的每一个元素，然后向下遍历
+// dp : 创建一个dp数组，dp[i][j] 表示到达 matrix[i][j] 的最小路径和
+func minFallingPathSum(matrix [][]int) int {
+	n := len(matrix)
+	res := 1 << 31
+	/** 回溯 : 超时
+	// 遍历需要传递所在的行数和当前的和
+	var dfs func(int, int, int)
+	dfs = func(row, col, sum int) {
+		if row == n {
+			res = min(res, sum)
+			return
+		}
+		sum += matrix[row][col]
+		for i := -1; i <= 1; i++ {
+			if col+i >= 0 && col+i < n { // 判断是否越界
+				dfs(row+1, col+i, sum)
+			}
+		}
+	}
+	for i := 0; i < n; i++ {
+		dfs(0, i, 0)
+	}
+	*/
+	dp := make([][]int, n)
+	for i := 0; i < n; i++ {
+		dp[i] = make([]int, n)
+	}
+	// init
+	for i := 1; i < n; i++ {
+		for j := 0; j < n; j++ {
+			dp[i][j] = res
+		}
+	}
+	for i := 0; i < n; i++ {
+		dp[0][i] = matrix[0][i]
+	}
+	// dp
+	for i := 1; i < n; i++ {
+		for j := 0; j < n; j++ {
+			for k := -1; k <= 1; k++ {
+				if j+k >= 0 && j+k < n {
+					dp[i][j] = min(dp[i][j], dp[i-1][j+k]+matrix[i][j])
+				}
+			}
+		}
+	}
+	for i := 0; i < n; i++ {
+		res = min(res, dp[n-1][i])
+	}
+	return res
+}
 func max64(a, b int64) int64 {
 	if a > b {
 		return a
@@ -59,4 +116,7 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+func min(a, b int) int {
+	return -max(-a, -b)
 }
